@@ -16,15 +16,18 @@ class Window(QDialog):
         # self.save_and_close_pushButton.clicked.connect(lambda: self.save_and_exit())
         self.save_and_close_pushButton.clicked.connect(self.close)
         self.show()
+        print('initialized window()')
 
     def return_strings(self):
         #   Return list of values. It need map with str (self.lineedit.text() will return QString)
         self.success_int = 1 if self.success_radioButton.isChecked() > 0 else 0
         self.failure_int = 1 if self.failure_radioButton.isChecked() > 0 else 0
+        print('returning strings...')
         return map(str, [str(self.success_int), str(self.failure_int),  self.note_lineEdit.text()])
 
     @staticmethod
     def get_data():
+        print('getting data')
         dialog = Window()
         dialog.exec_()
         return dialog.return_strings()

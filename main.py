@@ -28,8 +28,10 @@ import datetime
 import csv
 
 ############### popup GUI ############################
-from PyQt5 import uic
-from PyQt5 import QtCore, QtGui, QtWidgets
+# from PyQt5 import uic
+# from PyQt5 import QtCore, QtGui, QtWidgets
+
+from pyqt_funcs import posttrial_popup
 
 
 ##########################################################
@@ -37,13 +39,13 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 ####################################################
 ################  definitions ######################
 ####################################################
-camera_port =0 # Depending on the usb port, it can be 0, 1, 2....
+camera_port = 0 # Depending on the usb port, it can be 0, 1, 2....
 
 # define the lower and upper boundaries of the "green"
 # ball in the HSV color space, then initialize the
-
-orangeLower = (0, 141, 112) # BGR oramnge postit. 
-orangeUpper = (243, 255, 255)  # BGR  orange postit
+# Bmin: 0  Gmin: 0  Rmin 0 , Bmax: 161  Gmax: 164  Rmax: 58
+orangeLower = (0, 0, 0) # BGR oramnge postit. 
+orangeUpper = (161, 164, 58)  # BGR  orange postit
 
 def ellipse_tracking(hsvmask):
     #########################################################
@@ -428,16 +430,8 @@ def run_main(timeTag):
         """ GUI popup to ask if the trial was a success"""
         # x = int(input("Was this trial a success?  Y(1) or N(0) "))
         # replace with GUI to ask if this was a successful trial.
-        import graphical_panel.popup_window as POPUP
-        app = QtWidgets.QApplication(sys.argv)
-        w = POPUP.Window()
-        # w.setWindowTitle('User Input')
-        # w.show()
-        retval = [None] * 3
-        i = 0
-        for ch in w.get_data():
-            retval[i] = ch
-            i = i + 1
+        # retval = posttrial_popup(sys.argv)
+        retval = [True, '', '']
         isSuccess = retval[0]
         print('what does it say: ', isSuccess)
         note = retval[2]
