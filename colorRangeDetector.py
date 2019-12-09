@@ -13,6 +13,12 @@ from operator import xor
 import numpy as np
 import imutils
 
+try:
+    import settings
+    camera_port = settings.camera_port
+except ImportError:
+    camera_port = 2
+
 
 def callback(value):
     pass
@@ -21,10 +27,10 @@ def callback(value):
 def setup_trackbars(range_filter, bgrindex):
     # bmin, gmin, rmin, bmax, gmax, rmax
     cv2.namedWindow("Trackbars", 0)
-    cv2.resizeWindow("Trackbars", 200, 200);
-    
-    k=0
-    
+    cv2.resizeWindow("Trackbars", 200, 200)
+
+    k = 0
+
     for i in ["MIN", "MAX"]:
         v = 0 if i == "MIN" else 255
 
@@ -32,9 +38,9 @@ def setup_trackbars(range_filter, bgrindex):
             cv2.createTrackbar("%s_%s" % (j, i), "Trackbars", v, 255, callback)
             print(bgrindex[k])
             cv2.setTrackbarPos("%s_%s" % (j, i), "Trackbars", bgrindex[k])
-            k = k + 1 
-    
-    
+            k = k + 1
+
+
 def get_arguments():
     ap = argparse.ArgumentParser()
     ap.add_argument('-f', '--filter', required=True,
@@ -46,17 +52,17 @@ def get_arguments():
     ap.add_argument('-p', '--preview', required=False,
                     help='Show a preview of the image after applying the mask',
                     action='store_true')
-    ap.add_argument('-v', '--valsBGR', nargs='+', required=False, type = int, help='BGR values',
-                    default=(24, 142, 0, 120, 255, 255)) # light green
-                    #default = (44, 170, 114, 243, 219, 255))
-                    #best greenfileter: (24, 76, 0, 120, 199, 255) #  0, 204, 0
+    ap.add_argument('-v', '--valsBGR', nargs='+', required=False, type=int, help='BGR values',
+                    default=(24, 142, 0, 120, 255, 255))  # light green
+    # default = (44, 170, 114, 243, 219, 255))
+    # best greenfileter: (24, 76, 0, 120, 199, 255) #  0, 204, 0
 
-                    #green filter:(29, 86, 6, 64, 255, 255)
-                    #yellow: (16, 54, 40, 45, 255, 255)
-                    #blue: (30, 211, 0, 120,  255, 255)
-                    # orange: (0, 141, 112, 243, 255, 255)
-                    # light green/red (44, 170, 114, 243, 219, 255)
-    
+    # green filter:(29, 86, 6, 64, 255, 255)
+    #yellow: (16, 54, 40, 45, 255, 255)
+    #blue: (30, 211, 0, 120,  255, 255)
+    # orange: (0, 141, 112, 243, 255, 255)
+    # light green/red (44, 170, 114, 243, 219, 255)
+
     args = vars(ap.parse_args())
 
     if not xor(bool(args['image']), bool(args['webcam'])):
@@ -81,10 +87,9 @@ def get_trackbar_values(range_filter):
 
 def main():
     args = get_arguments()
-    camera_port = 2
 
-    bgrindex = args['valsBGR'] #[bmin, gmin, rmin, bmax, gmax, rmax
-    #print bgrindex
+    bgrindex = args['valsBGR']  # [bmin, gmin, rmin, bmax, gmax, rmax
+    # print bgrindex
     print(bgrindex)
     range_filter = args['filter'].upper()
 
@@ -115,25 +120,26 @@ def main():
             else:
                 frame_to_thresh = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
-        v1_min, v2_min, v3_min, v1_max, v2_max, v3_max = get_trackbar_values(range_filter)
+        v1_min, v2_min, v3_min, v1_max, v2_max, v3_max = get_trackbar_values(
+            range_filter)
 
-        hsvmask = cv2.inRange(frame_to_thresh, (v1_min, v2_min, v3_min), (v1_max, v2_max, v3_max))
+        hsvmask = cv2.inRange(
+            frame_to_thresh, (v1_min, v2_min, v3_min), (v1_max, v2_max, v3_max))
         # print "Bmin:", v1_min, " Gmin:", v2_min, " Rmin", v3_min, ", Bmax:", v1_max, " Gmax:", v2_max," Rmax:", v3_max
-        print("Bmin:", v1_min, " Gmin:", v2_min, " Rmin", v3_min, ", Bmax:", v1_max, " Gmax:", v2_max," Rmax:", v3_max)
+        print("Bmin:", v1_min, " Gmin:", v2_min, " Rmin", v3_min,
+              ", Bmax:", v1_max, " Gmax:", v2_max, " Rmax:", v3_max)
 
-
-        kernel = np.ones((2,2), np.uint8)
+        kernel = np.ones((2, 2), np.uint8)
         img_erosion = cv2.erode(hsvmask, kernel, iterations=1)
         img_dilation = cv2.dilate(img_erosion, kernel, iterations=5)
         if args['preview']:
-  
+
             #preview = cv2.bitwise_and(image, image, mask=hsvmask)
             cv2.imshow("Preview", img_dilation)
         else:
- 
+
             cv2.imshow("Original", image)
             cv2.imshow("Thresh", img_dilation)
-            
 
         if cv2.waitKey(1) & 0xFF is ord('q'):
             break

@@ -37,19 +37,27 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 ####################################################
 ################  definitions ######################
 ####################################################
-camera_port =0 # Depending on the usb port, it can be 0, 1, 2....
+try:
+    import settings
+    camera_port = settings.camera_port  # Depending on the usb port, it can be 0, 1, 2....
 
-# define the lower and upper boundaries of the "green"
-# ball in the HSV color space, then initialize the
+    # define the lower and upper boundaries of the "green"
+    # ball and "orange" disk in the BGR color space
+    greenLower = settings.greenLower
+    greenUpper = settings.greenLower
 
-# green filter is robust.
-#greenLower = (29, 86, 6) #  BGR  GREEN darker
-greenLower = (24, 142, 0) #  BGR  GREEN darker ##temp at night
-#greenUpper = (64, 255, 255) # BGR  GREEN lighter  %
-greenUpper = (120, 255, 255)
+    orangeLower = settings.orangeLower  # BGR orange
+    orangeUpper = settings.orangeUpper  # BGR orange
+except ImportError: # no settings file, use defaults
+    camera_port = 0  # Depending on the usb port, it can be 0, 1, 2....
 
-orangeLower = (0, 141, 112) # BGR oramnge postit. 
-orangeUpper = (243, 255, 255)  # BGR  orange postit
+    # define the lower and upper boundaries of the "green"
+    # ball in the HSV color space
+    greenLower = (24, 142, 0)  # BGR green
+    greenUpper = (120, 255, 255)  # BGR green
+
+    orangeLower = (0, 141, 112)  # BGR orange
+    orangeUpper = (243, 255, 255)  # BGR orange
 
 def ellipse_tracking(hsvmask):
     #########################################################
